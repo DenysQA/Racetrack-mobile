@@ -11,7 +11,7 @@
     stages \{\
         stage('Checkout') \{\
             steps \{\
-                git 'https://github.com/yourname/your-scratch-game.git'\
+                git 'https://github.com/yourname/Racetrack-mobile.git'\
             \}\
         \}\
 \
