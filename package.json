@@ -6,7 +6,11 @@
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 \{\
+<<<<<<< HEAD:package.json
   "name": "Racetrack-mobile",\
+=======
+  "name": \'ab\'a0R\'a0\'bbracetrack-mobile,\
+>>>>>>> 8669234 (test commit):package.rtf
   "version": "1.0.0",\
   "scripts": \{\
     "build:html": "npx github:turbowarp/packager-cli game.sb3 --html www/index.html",\
