@@ -29,8 +29,20 @@ pipeline {
                 which npm || (echo "❌ npm not found!" && exit 1)
                 node -v
                 npm -v
-                echo "⚙️ Running TurboWarp Packager directly from GitHub..."
-                npx --yes git+https://github.com/TurboWarp/packager-cli.git ${SB3_FILE} --target android --output ${BUILD_OUTPUT}
+
+                echo "⚙️ Installing TurboWarp Packager CLI (from npm)..."
+                npm install -g turbowarp-packager
+
+                echo "🚀 Building Scratch project into APK..."
+                npx --yes turbowarp-packager ${SB3_FILE} --target android --output ${BUILD_OUTPUT}
+
+                if [ ! -f "${BUILD_OUTPUT}" ]; then
+                    echo "❌ Build failed — APK not found!"
+                    exit 1
+                fi
+
+                echo "✅ Build completed successfully!"
+                ls -lh ${BUILD_OUTPUT}
             '''
         }
     }
