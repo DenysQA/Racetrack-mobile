@@ -29,12 +29,12 @@ pipeline {
                 which npm || (echo "❌ npm not found!" && exit 1)
                 node -v
                 npm -v
-                echo "⚙️ Installing TurboWarp Packager CLI..."
-                npm install git+https://github.com/TurboWarp/packager-cli.git
-                npx twpackager Racetrack_mobile_v0.0.sb3 --target android --output build.apk
+                echo "⚙️ Running TurboWarp Packager directly from GitHub..."
+                npx --yes git+https://github.com/TurboWarp/packager-cli.git ${SB3_FILE} --target android --output ${BUILD_OUTPUT}
             '''
         }
     }
+
         stage('Install Dependencies') {
             steps {
                 sh '''
