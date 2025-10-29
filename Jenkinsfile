@@ -38,26 +38,35 @@ pipeline {
             }
         }
 
-        stage('Build Android APK') {
-            steps {
-                sh '''
-                    echo "🚀 Building Scratch game to APK using TurboWarp API..."
-                    curl -X POST \
-                        -o ${BUILD_OUTPUT} \
-                        -F "project=@${SB3_FILE}" \
-                        -F "packager=android" \
-                        https://packager.turbowarp.org/
+    stage('Build Android APK') {
+        steps {
+            sh '''
+                echo "🚀 Building Scratch game to APK using TurboWarp API..."
+                
+                # Виконуємо запит і перевіряємо тип відповіді
+                RESPONSE=$(curl -s -w "%{content_type}" -X POST \
+                    -o build.apk \
+                    -F "project=@${SB3_FILE}" \
+                    https://packager.turbowarp.org/)
 
-                    if [ ! -f "${BUILD_OUTPUT}" ]; then
-                        echo "❌ Build failed — APK not found!"
-                        exit 1
-                    fi
+                if [[ "$RESPONSE" == "text/plain"* ]]; then
+                    echo "⚠️ TurboWarp returned a text response instead of APK:"
+                    cat build.apk
+                    rm build.apk
+                    exit 1
+                fi
 
-                    echo "✅ Build completed successfully!"
-                    ls -lh ${BUILD_OUTPUT}
-                '''
-            }
+                if [ ! -f "${BUILD_OUTPUT}" ]; then
+                    echo "❌ Build failed — APK not found!"
+                    exit 1
+                fi
+
+                echo "✅ Build completed successfully!"
+                ls -lh ${BUILD_OUTPUT}
+            '''
         }
+    }
+
     }
 
     post {
