@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs "Node18"
+    }
+
     environment {
         NODE_PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         SB3_URL = "https://raw.githubusercontent.com/DenysQA/Racetrack-mobile/main/Racetrack_mobile_v0.0.sb3"
