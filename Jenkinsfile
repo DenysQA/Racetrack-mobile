@@ -13,26 +13,16 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/DenysQA/Racetrack-mobile.git'
                 sshagent(['github_ssh']) {
                     git branch: 'main',
                         url: 'git@github.com:DenysQA/Racetrack-mobile.git'
                 }
             }
         }
-  stages {
-    stage('Checkout') {
-      steps {
-        sshagent(['github_ssh']) {
-          git branch: 'main',
-              url: 'git@github.com:DenysQA/Racetrack-mobile.git'
-        }
-      }
     }
-  }
+
         stage('Setup Node') {
             steps {
                 sh '''
