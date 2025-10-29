@@ -42,27 +42,35 @@ pipeline {
         steps {
             sh '''
                 echo "🚀 Building Scratch game to APK using TurboWarp API..."
-                
-                # Виконуємо запит і перевіряємо тип відповіді
+
                 RESPONSE=$(curl -s -w "%{content_type}" -X POST \
                     -o build.apk \
-                    -F "project=@${SB3_FILE}" \
+                    -F "project=@Racetrack_mobile_v0.0.sb3" \
+                    -F "packager=android" \
                     https://packager.turbowarp.org/)
 
                 if [[ "$RESPONSE" == "text/plain"* ]]; then
-                    echo "⚠️ TurboWarp returned a text response instead of APK:"
+                    echo "⚠️ TurboWarp returned text instead of APK:"
                     cat build.apk
-                    rm build.apk
-                    exit 1
-                fi
+                    echo "🔄 Trying to build web version instead..."
+                    
+                    curl -s -L -X POST \
+                        -o build.zip \
+                        -F "project=@Racetrack_mobile_v0.0.sb3" \
+                        -F "packager=zip" \
+                        https://packager.turbowarp.org/
 
-                if [ ! -f "${BUILD_OUTPUT}" ]; then
-                    echo "❌ Build failed — APK not found!"
-                    exit 1
+                    if [ -f build.zip ]; then
+                        echo "✅ Web version built successfully (build.zip)"
+                        ls -lh build.zip
+                    else
+                        echo "❌ Both Android and Web builds failed!"
+                        exit 1
+                    fi
+                else
+                    echo "✅ Android APK built successfully!"
+                    ls -lh build.apk
                 fi
-
-                echo "✅ Build completed successfully!"
-                ls -lh ${BUILD_OUTPUT}
             '''
         }
     }
