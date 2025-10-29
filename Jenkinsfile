@@ -13,7 +13,7 @@ pipeline {
             steps {
                 sh '''
                 # додаємо Homebrew до PATH, щоб знайти npm
-                export PATH=/opt/homebrew/bin:$PATH
+                export PATH=/usr/local/bin/node:$PATH
                 echo "PATH is $PATH"
 
                 echo "📦 Installing dependencies..."
