@@ -23,7 +23,7 @@ pipeline {
                 npm install
 
                 echo "🚀 Building Scratch game..."
-                npx github:turbowarp/packager-cli gRacetrack_mobile_v0.0.sb3 --target android --output build.apk
+                npx github:turbowarp/packager-cli Racetrack_mobile_v0.0.sb3 --target android --output build.apk
                 '''
             }
         }
