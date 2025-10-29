@@ -6,7 +6,6 @@ pipeline {
     }
 
     environment {
-        NODE_PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         SB3_URL = "https://raw.githubusercontent.com/DenysQA/Racetrack-mobile/main/Racetrack_mobile_v0.0.sb3"
         SB3_FILE = "Racetrack_mobile_v0.0.sb3"
         BUILD_OUTPUT = "build.apk"
@@ -19,40 +18,6 @@ pipeline {
                     git branch: 'main',
                         url: 'git@github.com:DenysQA/Racetrack-mobile.git'
                 }
-            }
-        }
-    stage('Setup Node') {
-        steps {
-            sh '''
-                echo "🧩 Checking Node.js and npm..."
-                which node || (echo "❌ Node.js not found!" && exit 1)
-                which npm || (echo "❌ npm not found!" && exit 1)
-                node -v
-                npm -v
-
-                echo "⚙️ Installing TurboWarp Packager CLI (from npm)..."
-                npm install -g turbowarp-packager
-
-                echo "🚀 Building Scratch project into APK..."
-                npx --yes turbowarp-packager ${SB3_FILE} --target android --output ${BUILD_OUTPUT}
-
-                if [ ! -f "${BUILD_OUTPUT}" ]; then
-                    echo "❌ Build failed — APK not found!"
-                    exit 1
-                fi
-
-                echo "✅ Build completed successfully!"
-                ls -lh ${BUILD_OUTPUT}
-            '''
-        }
-    }
-
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    echo "📦 Installing dependencies..."
-                    npm install
-                '''
             }
         }
 
@@ -76,8 +41,12 @@ pipeline {
         stage('Build Android APK') {
             steps {
                 sh '''
-                    echo "🚀 Building Scratch game to APK..."
-                    npx github:turbowarp/packager-cli ${SB3_FILE} --target android --output ${BUILD_OUTPUT} --no-chromium-sandbox
+                    echo "🚀 Building Scratch game to APK using TurboWarp API..."
+                    curl -X POST \
+                        -o ${BUILD_OUTPUT} \
+                        -F "project=@${SB3_FILE}" \
+                        -F "packager=android" \
+                        https://packager.turbowarp.org/
 
                     if [ ! -f "${BUILD_OUTPUT}" ]; then
                         echo "❌ Build failed — APK not found!"
