@@ -12,13 +12,18 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                echo Building Scratch game...
+                # додаємо Homebrew до PATH, щоб знайти npm
+                export PATH=/opt/homebrew/bin:$PATH
+                echo "PATH is $PATH"
+
+                echo "📦 Installing dependencies..."
                 npm install
+
+                echo "🚀 Building Scratch game..."
                 npx turbowarp-packager game.sb3 --target android --output build.apk
                 '''
             }
         }
-
     }
     post {
         success {

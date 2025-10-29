@@ -1,25 +1,17 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2865
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+#!/bin/bash
+set -e
 
-\f0\fs24 \cf0 #!/bin/bash\
-set -e\
-\
-INPUT_FILE="game.sb3"\
-OUTPUT_FILE="build/game.apk"\
-\
-mkdir -p build\
-\
-echo "\uc0\u55357 \u56615  Packaging $INPUT_FILE into APK..."\
-turbowarp-packager \\\
-  --input "$INPUT_FILE" \\\
-  --type android \\\
-  --app-name "My Scratch Game" \\\
-  --app-id "com.example.scratchgame" \\\
-  --output "$OUTPUT_FILE"\
-\
-echo "\uc0\u9989  Done! Created $OUTPUT_FILE"\
-}
+INPUT_FILE="Racetrack_mobile_v0.0.sb3"
+OUTPUT_FILE="build/Racetrack_mobile_v0.0.apk"
+
+mkdir -p build
+
+echo "🔧 Packaging $INPUT_FILE into APK..."
+turbowarp-packager
+--input "$INPUT_FILE"
+--type android
+--app-name "Racetrack_mobile"
+--app-id "com.example.racetrack"
+--output "$OUTPUT_FILE"
+
+echo "✅ Done! Created $OUTPUT_FILE"#!/bin/bash
