@@ -28,7 +28,7 @@ pipeline {
                     which npm || (echo "❌ npm not found!" && exit 1)
                     node -v
                     npm -v
-                    npm config set unsafe-perm true
+                    echo "⚙️ Installing TurboWarp Packager CLI..."
                     npm install github:turbowarp/packager-cli
                     npx twpackager Racetrack_mobile_v0.0.sb3 --target android --output build.apk
                 '''
