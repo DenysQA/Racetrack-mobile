@@ -31,11 +31,12 @@ pipeline {
                     node -v
                     npm -v
                     echo "⚙️ Installing TurboWarp Packager CLI..."
-                    npm install github:turbowarp/packager-cli
+                    npm install @turbowarp/packager-cli
                     npx twpackager Racetrack_mobile_v0.0.sb3 --target android --output build.apk
                 '''
             }
         }
+
 
         stage('Install Dependencies') {
             steps {
