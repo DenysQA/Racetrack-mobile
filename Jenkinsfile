@@ -13,8 +13,11 @@ pipeline {
             steps {
                 sh '''
                 # додаємо Homebrew до PATH, щоб знайти npm
-                export PATH=/usr/local/bin/node:$PATH
+                export PATH=/usr/local/bin:$PATH
                 echo "PATH is $PATH"
+                which node || echo "node not found"
+                which npm || echo "npm not found"
+                npm install 
 
                 echo "📦 Installing dependencies..."
                 npm install
