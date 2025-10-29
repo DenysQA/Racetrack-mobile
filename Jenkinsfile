@@ -21,23 +21,20 @@ pipeline {
                 }
             }
         }
-
-        stage('Setup Node') {
-            steps {
-                sh '''
-                    echo "🧩 Checking Node.js and npm..."
-                    which node || (echo "❌ Node.js not found!" && exit 1)
-                    which npm || (echo "❌ npm not found!" && exit 1)
-                    node -v
-                    npm -v
-                    echo "⚙️ Installing TurboWarp Packager CLI..."
-                    npm install @turbowarp/packager-cli
-                    npx twpackager Racetrack_mobile_v0.0.sb3 --target android --output build.apk
-                '''
-            }
+    stage('Setup Node') {
+        steps {
+            sh '''
+                echo "🧩 Checking Node.js and npm..."
+                which node || (echo "❌ Node.js not found!" && exit 1)
+                which npm || (echo "❌ npm not found!" && exit 1)
+                node -v
+                npm -v
+                echo "⚙️ Installing TurboWarp Packager CLI..."
+                npm install git+https://github.com/TurboWarp/packager-cli.git
+                npx twpackager Racetrack_mobile_v0.0.sb3 --target android --output build.apk
+            '''
         }
-
-
+    }
         stage('Install Dependencies') {
             steps {
                 sh '''
