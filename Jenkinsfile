@@ -38,7 +38,7 @@ pipeline {
             steps {
                 sh '''
                 echo "🚀 Starting app on custom port..."
-                PORT=8090 npx serve . -l $PORT &
+                npx serve . -l 8090 &
                 SERVER_PID=$!
                 sleep 5
 
@@ -59,9 +59,12 @@ pipeline {
                     node packager/dist/cli/index.js ${SB3_FILE} --html www/index.html
                 elif [ -f "packager/packages/cli/dist/index.js" ]; then
                     node packager/packages/cli/dist/index.js ${SB3_FILE} --html www/index.html
+                elif [ -f "packager/cli/dist/index.js" ]; then
+                    node packager/cli/dist/index.js ${SB3_FILE} --html www/index.html
                 else
-                    echo "⚠️ CLI not found, falling back to remote npx version..."
-                    npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || exit 1
+                    echo "⚠️ CLI not found, please check packager structure:"
+                    ls -R packager | head -50
+                    exit 1
                 fi
 
                 echo "✅ HTML build complete!"
