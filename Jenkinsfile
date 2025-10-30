@@ -37,34 +37,38 @@ pipeline {
         stage('Setup Node and Packager') {
             steps {
                 sh '''
-                    echo "🚀 Starting app on custom port..."
-                    export PORT=8090
-                    npx serve . --listen=$PORT &
-                    SERVER_PID=$!
-                    sleep 5
+                echo "🚀 Starting app on custom port..."
+                PORT=8090 npx serve . -l $PORT &
+                SERVER_PID=$!
+                sleep 5
 
-                    echo "🧩 Checking Node.js and npm..."
-                    node -v
-                    npm -v
+                echo "🧩 Checking Node.js and npm..."
+                node -v
+                npm -v
 
-                    echo "📦 Installing TurboWarp Packager (local clone)..."
-                    rm -rf packager
-                    git clone https://github.com/TurboWarp/packager.git
-                    cd packager
-                    npm install
-                    npm run build
+                echo "📦 Installing TurboWarp Packager (local clone)..."
+                rm -rf packager
+                git clone https://github.com/TurboWarp/packager.git
+                cd packager
+                npm install
+                npm run build
+                cd ..
 
-                    echo "🎮 Building HTML from SB3 using TurboWarp CLI..."
-                    npx github:turbowarp/packager-cli ../Racetrack_mobile_v0.0.sb3 --html ../www/index.html
+                echo "🎮 Building HTML from SB3 using local CLI..."
+                if [ -f "packager/dist/cli/index.js" ]; then
+                    node packager/dist/cli/index.js ${SB3_FILE} --html www/index.html
+                elif [ -f "packager/packages/cli/dist/index.js" ]; then
+                    node packager/packages/cli/dist/index.js ${SB3_FILE} --html www/index.html
+                else
+                    echo "⚠️ CLI not found, falling back to remote npx version..."
+                    npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || exit 1
+                fi
 
-                    echo "✅ HTML build complete!"
-                    cd ..
-                    kill $SERVER_PID || true
+                echo "✅ HTML build complete!"
+                kill $SERVER_PID || true
                 '''
             }
         }
-
-
         stage('Download Scratch Game') {
             steps {
                 sh '''
