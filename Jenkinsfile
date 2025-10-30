@@ -39,7 +39,9 @@ pipeline {
             steps {
                 sh '''
                 echo "🚀 Starting app on custom port..."
-                PORT=8090 npx serve . -l $PORT &
+
+                export PORT=8090
+                npx serve . --listen=$PORT &
                 SERVER_PID=$!
                 sleep 5
 
@@ -54,7 +56,7 @@ pipeline {
                 npm install
 
                 echo "🎮 Building HTML from SB3..."
-                node cli.js ../Racetrack_mobile_v0.0.sb3 --html ../www/index.html
+                npm run build -- ../Racetrack_mobile_v0.0.sb3 --html ../www/index.html
 
                 echo "✅ HTML build complete!"
                 cd ..
@@ -63,8 +65,6 @@ pipeline {
                 '''
             }
         }
-
-
 
         stage('Download Scratch Game') {
             steps {
