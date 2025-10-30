@@ -49,7 +49,7 @@ pipeline {
                 npm -v
 
                 echo "📦 Installing TurboWarp Packager CLI..."
-                npm install -g turbowarp-packager   # ✅ офіційна CLI
+                npx github:Turbowarp/packager Racetrack_mobile_v0.0.sb3 --html www/index.html   # ✅ офіційна CLI
 
                 echo "✅ TurboWarp Packager installed successfully"
                 pkill -f "serve" || kill $SERVER_PID
