@@ -6,7 +6,5 @@
     "build:android": "npx cap sync android && npx cap build android"
     "start": "npx serve . -l $PORT"
   },
-  },
+},
   "dependencies": {}
-}
-
