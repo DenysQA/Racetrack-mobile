@@ -69,57 +69,57 @@ pipeline {
         }
 
         stage('Build Android APK (Local TurboWarp)') {
-    steps {
-        echo '🚀 Starting local TurboWarp Packager build...'
+            steps {
+                echo '🚀 Starting local TurboWarp Packager build...'
 
-        // Переконуємось, що Node.js встановлено
-        sh '''
-        echo '🧩 Checking Node.js...'
-        node -v
-        npm -v
-        '''
+                // Переконуємось, що Node.js встановлено
+                sh '''
+                echo '🧩 Checking Node.js...'
+                node -v
+                npm -v
+                '''
 
-        // Клонуємо TurboWarp Packager, якщо ще не завантажено
-        sh '''
-        if [ ! -d "turbowarp-packager" ]; then
-            echo '📥 Cloning TurboWarp Packager repo...'
-            git clone https://github.com/TurboWarp/packager.git turbowarp-packager
-        fi
-        '''
+                // Клонуємо TurboWarp Packager, якщо ще не завантажено
+                sh '''
+                if [ ! -d "turbowarp-packager" ]; then
+                    echo '📥 Cloning TurboWarp Packager repo...'
+                    git clone https://github.com/TurboWarp/packager.git turbowarp-packager
+                fi
+                '''
 
-        // Встановлюємо залежності
-        sh '''
-        cd turbowarp-packager
-        echo '📦 Installing dependencies...'
-        npm install
-        npm run build
-        '''
+                // Встановлюємо залежності
+                sh '''
+                cd turbowarp-packager
+                echo '📦 Installing dependencies...'
+                npm install
+                npm run build
+                '''
 
-        // Запускаємо локальний сервер у бекграунді
-        sh '''
-        echo '🌐 Starting local TurboWarp server...'
-        cd turbowarp-packager
-        nohup npm start > ../turbowarp.log 2>&1 &
-        sleep 5
-        '''
+                // Запускаємо локальний сервер у бекграунді
+                sh '''
+                echo '🌐 Starting local TurboWarp server...'
+                cd turbowarp-packager
+                nohup npm start > ../turbowarp.log 2>&1 &
+                sleep 5
+                '''
 
-        // Виконуємо збірку .sb3 → APK через локальний сервер
-        sh '''
-        echo '⚙️ Building Android APK via local TurboWarp server...'
-        curl -X POST -o build.apk \
-            -F project=@Racetrack_mobile_v0.0.sb3 \
-            -F packager=android \
-            http://localhost:8080/packager
-        '''
+                // Виконуємо збірку .sb3 → APK через локальний сервер
+                sh '''
+                echo '⚙️ Building Android APK via local TurboWarp server...'
+                curl -X POST -o build.apk \
+                    -F project=@Racetrack_mobile_v0.0.sb3 \
+                    -F packager=android \
+                    http://localhost:8080/packager
+                '''
 
-        // Перевіряємо результат
-        sh '''
-        echo '✅ Build complete! Resulting APK:'
-        ls -lh build.apk
-        '''
+                // Перевіряємо результат
+                sh '''
+                echo '✅ Build complete! Resulting APK:'
+                ls -lh build.apk
+                '''
+            }
+         }
     }
-    }
-
     post {
         success {
             echo "🎉 Build pipeline completed successfully!"
