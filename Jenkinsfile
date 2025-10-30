@@ -39,23 +39,31 @@ pipeline {
             steps {
                 sh '''
                 echo "🚀 Starting app on custom port..."
-                PORT=8090 npx serve . -l $PORT &    # 🔧 запускаємо сервер з портом
+                PORT=8090 npx serve . -l $PORT &
                 SERVER_PID=$!
                 sleep 5
-                
+
                 echo "🧩 Checking Node.js and npm..."
-                which node
                 node -v
                 npm -v
 
-                echo "📦 Installing TurboWarp Packager CLI..."
-                npx github:Turbowarp/packager Racetrack_mobile_v0.0.sb3 --html www/index.html   # ✅ офіційна CLI
+                echo "📦 Installing TurboWarp Packager..."
+                rm -rf packager
+                git clone https://github.com/TurboWarp/packager.git
+                cd packager
+                npm install
 
-                echo "✅ TurboWarp Packager installed successfully"
-                pkill -f "serve" || kill $SERVER_PID
+                echo "🎮 Building HTML from SB3..."
+                node cli.js ../Racetrack_mobile_v0.0.sb3 --html ../www/index.html
+
+                echo "✅ HTML build complete!"
+                cd ..
+
+                kill $SERVER_PID || true
                 '''
             }
-}
+        }
+
 
 
         stage('Download Scratch Game') {
