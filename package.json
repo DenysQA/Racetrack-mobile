@@ -4,6 +4,8 @@
   "scripts": {
     "build:html": "npx github:turbowarp/packager-cli game.sb3 --html www/index.html",
     "build:android": "npx cap sync android && npx cap build android"
+    "start": "npx serve . -l $PORT"
+  },
   },
   "dependencies": {}
 }
