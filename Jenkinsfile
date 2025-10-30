@@ -25,119 +25,72 @@ pipeline {
         stage('Install System Dependencies') {
             steps {
                 sh '''
-                    echo "⚙️ Installing Java (required for Android build)..."
+                    echo "⚙️ Checking Java (required for Android build)..."
                     if ! command -v java >/dev/null 2>&1; then
-                        brew install openjdk@17 || sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+                        echo "Installing Java..."
+                        if command -v apt-get >/dev/null 2>&1; then
+                            sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+                        elif command -v brew >/dev/null 2>&1; then
+                            brew install openjdk@17
+                        fi
                     fi
-
                     java -version
                 '''
             }
         }
-        stage('Setup Node and Packager') {
-            steps {
-                sh '''
-                echo "🚀 Starting app on custom port..."
-                npx serve . -l 8090 &
-                SERVER_PID=$!
-                sleep 5
 
-                echo "🧩 Checking Node.js and npm..."
-                node -v
-                npm -v
-
-                echo "📦 Installing TurboWarp Packager (local clone)..."
-                rm -rf packager
-                git clone https://github.com/TurboWarp/packager.git
-                cd packager
-                npm install
-                npm run build
-                cd ..
-
-                echo "🎮 Building HTML from SB3 using TurboWarp remote CLI..."
-                npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || {
-                echo "❌ Failed to build HTML from SB3"
-                exit 1
-                }
-
-
-                echo "✅ HTML build complete!"
-                kill $SERVER_PID || true
-                '''
-            }
-        }
         stage('Download Scratch Game') {
             steps {
                 sh '''
                     echo "🎮 Downloading Scratch project..."
                     curl -L -o ${SB3_FILE} ${SB3_URL}
-                    echo "🎮 Building HTML from SB3 using remote TurboWarp CLI..."
-                    npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || {
-                    echo "❌ Failed to build HTML from SB3"
-                    exit 1
-                    }
+
+                    if [ ! -f "${SB3_FILE}" ]; then
+                        echo "❌ Scratch file not found after download!"
+                        exit 1
+                    fi
+
                     echo "✅ Scratch project downloaded successfully!"
                     ls -lh ${SB3_FILE}
                 '''
             }
         }
 
-        stage('Build Android APK (Local TurboWarp)') {
+        stage('Build HTML from SB3') {
             steps {
-                echo '🚀 Starting local TurboWarp Packager build...'
-
-                // Переконуємось, що Node.js встановлено
                 sh '''
-                echo '🧩 Checking Node.js...'
-                node -v
-                npm -v
-                '''
+                    echo "📦 Installing TurboWarp Packager..."
+                    rm -rf packager
+                    git clone https://github.com/TurboWarp/packager.git
+                    cd packager
+                    npm install
+                    npm run build
+                    cd ..
 
-                // Клонуємо TurboWarp Packager, якщо ще не завантажено
-                sh '''
-                if [ ! -d "turbowarp-packager" ]; then
-                    echo '📥 Cloning TurboWarp Packager repo...'
-                    git clone https://github.com/TurboWarp/packager.git turbowarp-packager
-                fi
-                '''
+                    echo "🎮 Building HTML from SB3 using TurboWarp CLI..."
+                    npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || {
+                        echo "❌ Failed to build HTML from SB3"
+                        exit 1
+                    }
 
-                // Встановлюємо залежності
-                sh '''
-                cd turbowarp-packager
-                echo '📦 Installing dependencies...'
-                npm install
-                npm run build
-                '''
-
-                // Запускаємо локальний сервер у бекграунді
-                sh '''
-                echo '🌐 Starting local TurboWarp server...'
-                cd turbowarp-packager
-                nohup npm start > ../turbowarp.log 2>&1 &
-                sleep 5
-                '''
-
-                // Виконуємо збірку .sb3 → APK через локальний сервер
-                sh '''
-                echo '⚙️ Building Android APK via local TurboWarp server...'
-                npm run build:html
-                npm run build:android
-                '''
-
-                // Перевіряємо результат
-                sh '''
-                echo '✅ Build complete! Resulting APK:'
-                ls -lh build.apk
+                    echo "✅ HTML build complete!"
                 '''
             }
-         }
-    }
-    post {
-        success {
-            echo "🎉 Build pipeline completed successfully!"
         }
-        failure {
-            echo "❌ Build failed!"
-        }
-    }
-}
+
+        stage('Build Android APK (Local TurboWarp)') {
+            steps {
+                sh '''
+                    echo "🚀 Building Android APK via local TurboWarp packager..."
+
+                    if [ ! -d "packager" ]; then
+                        git clone https://github.com/TurboWarp/packager.git
+                        cd packager
+                        npm install
+                        npm run build
+                        cd ..
+                    fi
+
+                    cd packager
+                    echo "🌐 Starting local TurboWarp server..."
+                    nohup npm start
