@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "build:html": "npx github:turbowarp/packager-cli game.sb3 --html www/index.html",
-    "build:android": "npx cap sync android && npx cap build android"
+    "build:android": "npx cap sync android && npx cap build android",
     "start": "npx serve . -l $PORT"
   },
-},
-  "dependencies": {}
+  "dependencies": {
+    "serve": "^14.0.1"
+  }
+}
