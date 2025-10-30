@@ -34,7 +34,6 @@ pipeline {
                 '''
             }
         }
-
         stage('Setup Node and Packager') {
             steps {
                 sh '''
