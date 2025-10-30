@@ -54,18 +54,12 @@ pipeline {
                 npm run build
                 cd ..
 
-                echo "🎮 Building HTML from SB3 using local CLI..."
-                if [ -f "packager/dist/cli/index.js" ]; then
-                    node packager/dist/cli/index.js ${SB3_FILE} --html www/index.html
-                elif [ -f "packager/packages/cli/dist/index.js" ]; then
-                    node packager/packages/cli/dist/index.js ${SB3_FILE} --html www/index.html
-                elif [ -f "packager/cli/dist/index.js" ]; then
-                    node packager/cli/dist/index.js ${SB3_FILE} --html www/index.html
-                else
-                    echo "⚠️ CLI not found, please check packager structure:"
-                    ls -R packager | head -50
-                    exit 1
-                fi
+                echo "🎮 Building HTML from SB3 using TurboWarp remote CLI..."
+                npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || {
+                echo "❌ Failed to build HTML from SB3"
+                exit 1
+                }
+
 
                 echo "✅ HTML build complete!"
                 kill $SERVER_PID || true
