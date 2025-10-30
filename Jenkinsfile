@@ -77,12 +77,11 @@ pipeline {
                 sh '''
                     echo "🎮 Downloading Scratch project..."
                     curl -L -o ${SB3_FILE} ${SB3_URL}
-
-                    if [ ! -f "${SB3_FILE}" ]; then
-                        echo "❌ Scratch file not found after download!"
-                        exit 1
-                    fi
-
+                    echo "🎮 Building HTML from SB3 using remote TurboWarp CLI..."
+                    npx github:turbowarp/packager-cli ${SB3_FILE} --html www/index.html || {
+                    echo "❌ Failed to build HTML from SB3"
+                    exit 1
+                    }
                     echo "✅ Scratch project downloaded successfully!"
                     ls -lh ${SB3_FILE}
                 '''
