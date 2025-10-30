@@ -39,7 +39,8 @@ pipeline {
             steps {
                 sh '''
                     echo "🚀 Starting app on custom port..."
-                    PORT=8090 npm start
+                    PORT=8090 npx serve . -l $PORT &
+                    sleep 5
                     echo "🧩 Checking Node.js and npm..."
                     which node
                     node -v
@@ -106,10 +107,8 @@ pipeline {
                 // Виконуємо збірку .sb3 → APK через локальний сервер
                 sh '''
                 echo '⚙️ Building Android APK via local TurboWarp server...'
-                curl -X POST -o build.apk \
-                    -F project=@Racetrack_mobile_v0.0.sb3 \
-                    -F packager=android \
-                    http://localhost:8080/packager
+                npm run build:html
+                npm run build:android
                 '''
 
                 // Перевіряємо результат
