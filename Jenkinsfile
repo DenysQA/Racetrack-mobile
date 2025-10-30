@@ -12,7 +12,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 sshagent(['github_ssh']) {
@@ -44,12 +43,10 @@ pipeline {
                 sh '''
                     echo "🎮 Downloading Scratch project..."
                     curl -L -o ${SB3_FILE} ${SB3_URL}
-
                     if [ ! -f "${SB3_FILE}" ]; then
                         echo "❌ Scratch file not found after download!"
                         exit 1
                     fi
-
                     echo "✅ Scratch project downloaded successfully!"
                     ls -lh ${SB3_FILE}
                 '''
@@ -93,4 +90,29 @@ pipeline {
 
                     cd packager
                     echo "🌐 Starting local TurboWarp server..."
-                    nohup npm start
+                    nohup npm start > ../turbowarp.log 2>&1 &
+                    sleep 5
+                    cd ..
+
+                    echo "⚙️ Building Android APK..."
+                    npm run build:android || {
+                        echo "❌ Android build failed!"
+                        exit 1
+                    }
+
+                    echo "✅ Build complete! Resulting APK (if any):"
+                    ls -lh ${BUILD_OUTPUT} || true
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🎉 Build pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Build failed!"
+        }
+    }
+}
