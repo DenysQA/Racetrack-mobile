@@ -56,8 +56,8 @@ pipeline {
                 npm install
 
                 echo "🎮 Building HTML from SB3..."
-                npm install github:turbowarp/packager-cli
-                npx packager-cli ../Racetrack_mobile_v0.0.sb3 --html ../www/index.html
+                echo "🎮 Building HTML from SB3..."
+                npx packager-cli Racetrack_mobile_v0.0.sb3 --html www/index.html
 
                 echo "✅ HTML build complete!"
                 cd ..
