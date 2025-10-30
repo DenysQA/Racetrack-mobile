@@ -38,20 +38,25 @@ pipeline {
         stage('Setup Node and Packager') {
             steps {
                 sh '''
-                    echo "🚀 Starting app on custom port..."
-                    PORT=8090 npx serve . -l $PORT &   # запуск у фоні
-                    SERVER_PID=$!
-                    sleep 5
-                    echo "🧩 Checking Node.js and npm..."
-                    which node
-                    node -v
-                    npm -v
+                echo "🚀 Starting app on custom port..."
+                PORT=8090 npx serve . -l $PORT &    # 🔧 запускаємо сервер з портом
+                SERVER_PID=$!
+                sleep 5
+                
+                echo "🧩 Checking Node.js and npm..."
+                which node
+                node -v
+                npm -v
 
-                    echo "📦 Installing TurboWarp Packager CLI..."
-                    npm install -g github:turbowarp/packager-cli
+                echo "📦 Installing TurboWarp Packager CLI..."
+                npm install -g turbowarp-packager   # ✅ офіційна CLI
+
+                echo "✅ TurboWarp Packager installed successfully"
+                pkill -f "serve" || kill $SERVER_PID
                 '''
             }
-        }
+}
+
 
         stage('Download Scratch Game') {
             steps {
