@@ -38,6 +38,8 @@ pipeline {
         stage('Setup Node and Packager') {
             steps {
                 sh '''
+                    echo "🚀 Starting app on custom port..."
+                    PORT=8090 npm start
                     echo "🧩 Checking Node.js and npm..."
                     which node
                     node -v
@@ -66,22 +68,56 @@ pipeline {
             }
         }
 
-        stage('Build Android APK') {
-            steps {
-                sh '''
-                    echo "🚀 Building Android APK using TurboWarp Packager CLI..."
-                    twpackager ${SB3_FILE} --target android --output ${BUILD_OUTPUT} --no-chromium-sandbox
+        stage('Build Android APK (Local TurboWarp)') {
+    steps {
+        echo '🚀 Starting local TurboWarp Packager build...'
 
-                    if [ ! -f "${BUILD_OUTPUT}" ]; then
-                        echo "❌ Build failed — APK not found!"
-                        exit 1
-                    fi
+        // Переконуємось, що Node.js встановлено
+        sh '''
+        echo '🧩 Checking Node.js...'
+        node -v
+        npm -v
+        '''
 
-                    echo "✅ Build completed successfully!"
-                    ls -lh ${BUILD_OUTPUT}
-                '''
-            }
-        }
+        // Клонуємо TurboWarp Packager, якщо ще не завантажено
+        sh '''
+        if [ ! -d "turbowarp-packager" ]; then
+            echo '📥 Cloning TurboWarp Packager repo...'
+            git clone https://github.com/TurboWarp/packager.git turbowarp-packager
+        fi
+        '''
+
+        // Встановлюємо залежності
+        sh '''
+        cd turbowarp-packager
+        echo '📦 Installing dependencies...'
+        npm install
+        npm run build
+        '''
+
+        // Запускаємо локальний сервер у бекграунді
+        sh '''
+        echo '🌐 Starting local TurboWarp server...'
+        cd turbowarp-packager
+        nohup npm start > ../turbowarp.log 2>&1 &
+        sleep 5
+        '''
+
+        // Виконуємо збірку .sb3 → APK через локальний сервер
+        sh '''
+        echo '⚙️ Building Android APK via local TurboWarp server...'
+        curl -X POST -o build.apk \
+            -F project=@Racetrack_mobile_v0.0.sb3 \
+            -F packager=android \
+            http://localhost:8080/packager
+        '''
+
+        // Перевіряємо результат
+        sh '''
+        echo '✅ Build complete! Resulting APK:'
+        ls -lh build.apk
+        '''
+    }
     }
 
     post {
