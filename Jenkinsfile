@@ -39,7 +39,8 @@ pipeline {
             steps {
                 sh '''
                     echo "🚀 Starting app on custom port..."
-                    PORT=8090 npx serve . -l $PORT &
+                    PORT=8090 npx serve . -l $PORT &   # запуск у фоні
+                    SERVER_PID=$!
                     sleep 5
                     echo "🧩 Checking Node.js and npm..."
                     which node
@@ -47,7 +48,7 @@ pipeline {
                     npm -v
 
                     echo "📦 Installing TurboWarp Packager CLI..."
-                    npm install -g @turbowarp/packager-cli
+                    npm install -g github:turbowarp/packager-cli
                 '''
             }
         }
